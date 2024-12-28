@@ -1,0 +1,1 @@
+local monitor = peripheral.find("monitor")
