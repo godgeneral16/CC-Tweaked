@@ -29,7 +29,7 @@ local graphsToDraw = {}
 local graphs = {
     "Coolant level",
     "Temperature",
-    "Fuel level",
+    "Fuel Level",
 }
 
 local XOffs =
