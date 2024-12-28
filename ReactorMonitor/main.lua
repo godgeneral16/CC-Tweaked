@@ -1,6 +1,6 @@
 local monitorVersion = "0.1.0-beta"
 
-dofile("/usr/apis/touchpoint.lua")
+-- dofile("/usr/apis/touchpoint.lua")
 local monitor, monitorSide
 local sizex, sizey, dim, oo, offy
 local reactor
@@ -135,7 +135,7 @@ local function initMonitor()
     end
 
     resetMonitor()
-    t = touchpoint.new(monitor)
+    -- t = touchpoint.new(monitor)
     sizex, sizey = monitor.getSize()
     oo = sizey - 37
     dim = sizex - 33
@@ -226,7 +226,6 @@ local function updateStats()
     wasteFilledPercentage = string.format("%.2f", reactor.getWasteFilledPercentage() * 100)
 
     burnRate = reactor.getBurnRate()
-    fuelUsage = reactor.getFuelConsumedLastTick()
 
     hotCoolant = reactor.getHeatedCoolant().amount
     hotCoolantMax = reactor.getHeatedCoolantCapacity()
@@ -244,6 +243,30 @@ local function startTimer(ticksToUpdate, callback)
         end
     end
     return fun
+end
+
+local function getAvailableXOff()
+    for i,v in pairs(XOffs) do
+        if (v[2] and v[1] < dim) then
+            v[2] = false
+            return v[1]
+        end
+    end
+    return -1
+end
+
+local function enableGraph(name)
+    if (graphsToDraw[name] ~= nil) then
+        return
+    end
+    local e = getAvailableXOff()
+    if (e ~= -1) then
+        graphsToDraw[name] = e
+    end
+end
+
+local function loadConfig()
+    enableGraph("Fuel Level")
 end
 
 -- Main loop
@@ -294,8 +317,9 @@ local function main()
     print("Reactor detected! Proceeding with initialization...")
 
     print("Loading configuration...")
+    loadConfig()
 
-    Print("Configuration loaded! Starting monitor...")
+    print("Configuration loaded! Starting monitor...")
     initMonitor()
 
     print("Writing config to disk...")
