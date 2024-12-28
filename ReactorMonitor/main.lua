@@ -27,7 +27,7 @@ local graphsToDraw = {}
 
 -- Graphs
 local graphs = {
-    "Coolant level",
+    "Coolant Level",
     "Temperature",
     "Fuel Level",
 }
@@ -53,7 +53,7 @@ end
 
 -- Draw a box with no fill
 local function drawBox(size, xoff, yoff, color)
-    if (monSide == nil) then
+    if (monitorSide == nil) then
         return
     end
     local x,y = monitor.getCursorPos()
@@ -77,7 +77,7 @@ end
 
 --Draw a filled box
 local function drawFilledBox(size, xoff, yoff, colorOut, colorIn)
-    if (monSide == nil) then
+    if (monitorSide == nil) then
         return
     end
     local horizLine = string.rep(" ", size[1] - 2)
@@ -94,7 +94,7 @@ end
 
 --Draws text on the screen
 local function drawText(text, x1, y1, backColor, textColor)
-    if (monSide == nil) then
+    if (monitorSide == nil) then
         return
     end
     local x, y = monitor.getCursorPos()
@@ -155,6 +155,15 @@ local function detectReactor()
     return false
 end
 
+-- format names
+local function formatName(name)
+    return name:match("^[^:]+:([^:]+)")
+end
+
+local function rnd(num, dig)
+    return math.floor(10 ^ dig * num) / (10 ^ dig)
+end
+
 -- Draw fuel levels
 local function drawFuelLevel(xoff)
     local srf = sizey - 9
@@ -173,7 +182,27 @@ local function drawFuelLevel(xoff)
 
     drawText(string.format(right and "%.2f%%" or "%5.2f%%", rndpw), poff, srf + 5 - fuel, colors.black, color)
     drawText("Fuel Level", off + 1, 4, colors.black, colors.orange)
-    drawText("Fuel", off + 1, srf + 5 - fuel, fuel > 0 and color or colors.red, colors.black)
+    drawText(formatName(reactor.getFuel().name), off + 1, srf + 5 - fuel, fuel > 0 and color or colors.red, colors.black)
+end
+
+local function drawCoolantLevel(xoff)
+    local srf = sizey - 9
+    local off = xoff
+    local right = off + 19 < dim
+    local poff = right and off + 15 or off - 6
+
+    drawBox({15, srf + 2}, off -1, 4, colors.gray)
+    local coolant = math.floor(coolantLevel / maxCoolantLevel * srf)
+    drawFilledBox({13, srf}, off, 5, colors.red, colors.red)
+    local rndpw = rnd(coolantFilledPercentage, 2)
+    local color = (rndpw < maxb and rndpw > minb) and colors.green or (rndpw >= maxb and colors.orange or colors.blue)
+    if (coolant > 0) then
+        drawFilledBox({13, coolant + 1}, off, srf + 4 - coolant, color, color)
+    end
+
+    drawText(string.format(right and "%.2f%%" or "%5.2f%%", rndpw), poff, srf + 5 - coolant, colors.black, color)
+    drawText("Coolant Level", off + 1, 4, colors.black, colors.blue)
+    drawText(formatName(reactor.getCoolant().name), off + 1, srf + 5 - coolant, coolant > 0 and color or colors.red, colors.black)
 end
 
 local function drawGraph(name, offset)
@@ -266,39 +295,22 @@ local function enableGraph(name)
 end
 
 local function loadConfig()
+    maxb = 70
+    minb = 30
+    sizex, sizey = monitor.getSize()
+    dim = sizex - 33
+    oo = sizey - 37
     enableGraph("Fuel Level")
+    enableGraph("Coolant Level")
 end
 
 -- Main loop
 local function loop()
-    local ticksToUpdateStats = 20
-    local ticksToRedraw = 20
-
-    local updateStatsTick = startTime(
-        ticksToUpdateStats,
-        function()
-            updateStats()
-        end
-    )
-
-    local redrawTick = startTimer(
-        ticksToRedraw,
-        function()
-            drawScene()
-        end
-    )
-
-    local handleResize = function(event)
-        if (event[1] == "monitor_resize") then
-            initMonitor()
-        end
-    end
-
     while true do
-        local event = (monitorSide == nil) and { os.pullEvent() }
-        updateStatsTick(event)
-        handleResize(event)
-        redrawTick(event)
+        updateStats()
+        initMonitor()
+        drawScene()
+        sleep(1)
     end
 end
 
