@@ -6,8 +6,10 @@ local ccs_file_path = "Station%20System/main.lua" -- Central Control System
 local station_file_path = "Central%20Control%20System/main.lua" -- Station System
 
 -- Paths
-local ccs_path = "Resource_Request_System/CCS/main.lua"
-local station_path = "Resource_Request_System/Station/main.lua"
+local ccs_path = "Resource_Request_System/CCS/"
+local station_path = "Resource_Request_System/Station/"
+
+local file_name = "main.lua"
 
 local function createDirectory(path)
     local dirs ={}
@@ -27,11 +29,11 @@ local function createDirectory(path)
 end
 
 -- Download files from Github
-local function downloadFile(url, savePath)
+local function downloadFile(url, savePath, fileName)
     createDirectory(savePath)
     local response = http.get(url)
     if response then
-        local file = fs.open(savePath, "w")
+        local file = fs.open(savePath .. fileName, "w")
         file.write(response.readAll())
         file.close()
         print("Downloaded " .. savePath)
