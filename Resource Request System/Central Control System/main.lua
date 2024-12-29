@@ -7,6 +7,12 @@ if not modem then
     error("No wireless modem found")
 end
 
+-- Check for rsBridge
+local rsBridge = peripheral.find("rsBridge")
+if not rsBridge then
+    error("No rsBridge found")
+end
+
 -- Load configuration
 local config = {
     main_channel = 100,
@@ -17,10 +23,16 @@ local config = {
 modem.open(config.main_channel)
 modem.open(config.notify_channel)
 
--- Mock inventory
-local inventory = {
-    iron_ingot = 10000
-}
+-- load available items
+local function getAvailableItems()
+    local items = rsBridge.listItems()
+    if not items then
+        print("Failed to fetch items from RS Network")
+        return
+    end
+
+    return items
+end
 
 -- Request handler
 local function handleRequests(message, replyChannel)
@@ -32,20 +44,24 @@ local function handleRequests(message, replyChannel)
     local successItems = {}
     local failedItems = {}
 
+    local availableItems = getAvailableItems()
+
     -- Process each item in the request
     for _, itemRequest in pairs(items) do
         local item = itemRequest.item
         local amount = itemRequest.amount
+        local found = false
 
         print("Checking " .. amount .. " of " .. item)
 
-        if inventory[item] and inventory[item] >= amount then
-            inventory[item] = inventory[item] - amount
-            print("Sending " .. amount .. " of " .. item .. " to " .. station)
-            table.insert(successItems, { item = item, amount = amount })
-        else
-            print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
-            table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
+        for _, availableItem in pairs(availableItems) do
+            if availableItem.name == item and availableItem.amount >= amount then
+                print("Sending " .. amount .. " of " .. item .. " to " .. station)
+                table.insert(successItems, { item = item, amount = amount })
+            else
+                print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
+                table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
+            end
         end
     end
 
