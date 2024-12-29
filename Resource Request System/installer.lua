@@ -6,8 +6,8 @@ local ccs_file_path = "Station%20System/main.lua" -- Central Control System
 local station_file_path = "Central%20Control%20System/main.lua" -- Station System
 
 -- Paths
-local ccs_path = "Resource Request System/CCS/main.lua"
-local station_path = "Resource Request System/Station/main.lua"
+local ccs_path = "Resource_Request_System/CCS/main.lua"
+local station_path = "Resource_Request_System/Station/main.lua"
 
 local function createDirectory(path)
     local dirs ={}
@@ -24,6 +24,7 @@ local function createDirectory(path)
         end
         currentPath = currentPath .. "/"
     end
+end
 
 -- Download files from Github
 local function downloadFile(url, savePath)
