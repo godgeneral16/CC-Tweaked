@@ -37,15 +37,15 @@ local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
-        if senderChannel == MAIN_CHANNEL then
+        if senderChannel == config.main_channel then
             if type(message) == "table" and message.type == "response" then
-                if message.status == "success" then
+                if message.status == "Success" then
                     print("Request successful! " .. message.message)
-                elseif message.status == "failed" then
+                elseif message.status == "Failed" then
                     print("Request failed: " .. message.message)
                 end
             end
-        elseif senderChannel == NOTIFY_CHANNEL then
+        elseif senderChannel == config.notify_channel then
             if type(message) == "table" and message.type == "arrival" then
                 print("Arrival notification: " .. message.station .. " received the following items:")
 
@@ -59,9 +59,9 @@ end
 
 -- Example request to send multiple items
 local itemsToRequest = {
+    { item = "iron_ingot", amount = 100 },
     { item = "mekanism_uranium", amount = 500 },
     { item = "gold_ingot", amount = 100 },
-    { item = "iron_ingot", amount = 100 }
 }
 
 -- Request resources from Central Control

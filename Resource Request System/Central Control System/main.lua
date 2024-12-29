@@ -13,8 +13,14 @@ local config = {
     notify_channel = 101,
 }
 
+local response = {
+    type = "response",
+    status = "Success",
+    message = "Request successful"
+}
+
 -- Open channels
-modem.opem(config.main_channel)
+modem.open(config.main_channel)
 modem.open(config.notify_channel)
 
 -- Mock inventory
