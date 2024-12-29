@@ -62,7 +62,7 @@ local function installSoftware(softwareType)
     if fs.exists(path) then
         print(path .. " already exists, Do you want to overwrite it? (y/n)")
         local answer = io.read()
-        if answer:lower() ~= "yes" then
+        if answer:lower() ~= "y" then
             print("Installation cancelled")
             return
         end
@@ -71,7 +71,7 @@ local function installSoftware(softwareType)
     -- Ask user if he wants to run it as startup.lua
     print("Do you want to run this software on startup? (y/n)")
     local runOnStartup = io.read()
-    if runOnStartup:lower() == "yes" then
+    if runOnStartup:lower() == "y" then
         local startupPath = "startup.lua"
         local startupFile = fs.open(startupPath, "w")
         startupFile.write("shell.run(\"" .. path .. "\")")
@@ -80,7 +80,7 @@ local function installSoftware(softwareType)
     end
 
     -- Download and install
-    downloadFile(url, path)
+    downloadFile(url, path, file_name)
     print(softwareType .. " installed successfully")
 end
 
