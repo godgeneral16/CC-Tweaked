@@ -1,8 +1,5 @@
 local version = "0.1.0-beta"
 
-local http = require("http")
-local fs = require("fs")
-
 -- Github information
 local github_base_url = "https://raw.github.com/godgeneral16/CC-Tweaked/main/Resource%20Request%20System/"
 local ccs_file_path = "Station%20System/main.lua" -- Central Control System
@@ -12,8 +9,25 @@ local station_file_path = "Central%20Control%20System/main.lua" -- Station Syste
 local ccs_path = "Resource Request System/CCS/main.lua"
 local station_path = "Resource Request System/Station/main.lua"
 
+local function createDirectory(path)
+    local dirs ={}
+    for dir in path:gmatch("[^/]+") do
+        table.insert(dirs, dir)
+    end
+
+    local currentPath = ""
+    for i, dir in ipairs(dirs) do
+        currentPath = currentPath .. dir
+        if not fs.exists(currentPath) then
+            fs.makeDir(currentPath)
+            print("Created directory " .. currentPath)
+        end
+        currentPath = currentPath .. "/"
+    end
+
 -- Download files from Github
 local function downloadFile(url, savePath)
+    createDirectory(savePath)
     local response = http.get(url)
     if response then
         local file = fs.open(savePath, "w")
