@@ -39,10 +39,17 @@ local function handleResponses()
 
         if senderChannel == config.main_channel then
             if type(message) == "table" and message.type == "response" then
-                if message.status == "Success" then
-                    print("Request successful! " .. message.message)
-                elseif message.status == "Failed" then
-                    print("Request failed: " .. message.message)
+                if #message.successItems > 0 then
+                    print("Request succeeded, received the following items:")
+                    for _, successItems in ipairs(message.successItems) do
+                        print(successItems.amount .. "x " .. successItems.item)
+                    end
+                end
+                if #message.failedItems > 0 then
+                    print("Request failed for the following items:")
+                    for _, failedItems in ipairs(message.failedItems) do
+                        print(failedItems.amount .. "x " .. failedItems.item .. " - " .. failedItems.reason)
+                    end
                 end
             end
         elseif senderChannel == config.notify_channel then

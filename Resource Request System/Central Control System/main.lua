@@ -13,12 +13,6 @@ local config = {
     notify_channel = 101,
 }
 
-local response = {
-    type = "response",
-    status = "Success",
-    message = "Request successful"
-}
-
 -- Open channels
 modem.open(config.main_channel)
 modem.open(config.notify_channel)
@@ -42,23 +36,39 @@ local function handleRequests(message, replyChannel)
 
         print("Checking " .. amount .. " of " .. item)
 
+        local successItems = {}
+        local failedItems = {}
+
         if inventory[item] and inventory[item] >= amount then
             inventory[item] = inventory[item] - amount
             print("Sending " .. amount .. " of " .. item .. " to " .. station)
+            table.insert(successItems, { item = item, amount = amount })
         else
-            response.status = "Failed"
-            response.message = "Insuffucient stock for " .. item
-            break
+            print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
+            table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
         end
     end
+
+    local response = {
+        type = "response",
+        status = "Success",
+        message = "Request successful",
+        successItems = successItems,
+        failedItems = failedItems
+    }
 
     modem.transmit(replyChannel, config.main_channel, response)
 
     -- Simulate dispatch logic
-    if response.status == "Success" then
-        print("All items dispatched to " .. station)
-    else
+    if #successItems > 0 then
+        print("Successfully dispatched items to " .. station)
+    end
+
+    if #failedItems > 0 then
         print("Failed to dispatch items to " .. station)
+        for _, failed in ipairs(failedItems) do
+            print("Failed: " .. failed.amount .. " of " .. failed.item .. " - Reason: " .. (failed.reason or "Insufficient stock"))
+        end
     end
 end
 
