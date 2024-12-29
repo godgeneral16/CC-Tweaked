@@ -44,8 +44,8 @@ local function handleResponses()
                     print(" ")
                     term.setTextColor(colors.green)
                     print("Request succeeded, received the following items:")
-                    print(" ")
                     term.setTextColor(colors.white)
+                    print("--------------------------")
                     for _, successItems in ipairs(message.successItems) do
                         print(successItems.amount .. "x " .. successItems.item)
                     end
@@ -53,10 +53,14 @@ local function handleResponses()
                 if #message.failedItems > 0 then
                     print(" ")
                     print(" ")
+                    term.setTextColor(colors.red)
                     print("Request failed for the following items:")
-                    print(" ")
+                    term.setTextColor(colors.white)
+                    print("--------------------------")
                     for _, failedItems in ipairs(message.failedItems) do
-                        print(failedItems.amount .. "x " .. failedItems.item .. " - " .. failedItems.reason)
+                        print(failedItems.amount .. "x " .. failedItems.item .. " - ")
+                        term.setTextColor(colors.yellow)
+                        io.write(failedItems.reason)
                     end
                 end
             end
