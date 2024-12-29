@@ -2,8 +2,8 @@ local version = "0.1.0-beta"
 
 -- Github information
 local github_base_url = "https://raw.github.com/godgeneral16/CC-Tweaked/main/Resource%20Request%20System/"
-local ccs_file_path = "Station%20System/main.lua" -- Central Control System
-local station_file_path = "Central%20Control%20System/main.lua" -- Station System
+local ccs_file_path = "Central%20Control%20System/main.lua" -- Central Control System
+local station_file_path = "Station%20System/main.lua" -- Station System
 
 -- Paths
 local ccs_path = "Resource_Request_System/CCS/"
@@ -74,7 +74,7 @@ local function installSoftware(softwareType)
     if runOnStartup:lower() == "y" then
         local startupPath = "startup.lua"
         local startupFile = fs.open(startupPath, "w")
-        startupFile.write("shell.run(\"" .. path .. "\")")
+        startupFile.write("shell.run(\"" .. path .. file_name .. "\")")
         startupFile.close()
         print("Startup script created successfully")
     end
