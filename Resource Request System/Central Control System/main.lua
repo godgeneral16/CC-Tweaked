@@ -58,10 +58,14 @@ local function handleRequests(message, replyChannel)
             if availableItem.name == item and availableItem.amount >= amount then
                 print("Sending " .. amount .. " of " .. item .. " to " .. station)
                 table.insert(successItems, { item = item, amount = amount })
-            else
-                print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
-                table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
+                found = true
+                break
             end
+        end
+
+        if not found then
+            print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
+            table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
         end
     end
 
