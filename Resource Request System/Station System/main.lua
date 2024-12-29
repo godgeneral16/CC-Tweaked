@@ -58,9 +58,11 @@ local function handleResponses()
                     term.setTextColor(colors.white)
                     print("--------------------------")
                     for _, failedItems in ipairs(message.failedItems) do
-                        print(failedItems.amount .. "x " .. failedItems.item .. " - ")
+                        io.write(failedItems.amount .. "x " .. failedItems.item .. " - ")
                         term.setTextColor(colors.yellow)
                         io.write(failedItems.reason)
+                        term.setTextColor(colors.white)
+                        print()
                     end
                 end
             end
