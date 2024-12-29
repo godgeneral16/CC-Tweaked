@@ -1,6 +1,6 @@
 -- Central Control System (CCS) main script
 local version = "0.1.0-beta"
-local tag = "CCS_config"
+local tag = "RRS_CCS"
 
 local modem = peripheral.find("modem", function(_, m) return m.isWireless() end)
 if not modem then
@@ -19,7 +19,7 @@ modem.open(config.notify_channel)
 
 -- Mock inventory
 local inventory = {
-    ["minecraft:iron_ingot"] = 10000
+    iron_ingot = 10000
 }
 
 -- Request handler
