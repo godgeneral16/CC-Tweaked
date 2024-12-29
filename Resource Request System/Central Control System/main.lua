@@ -29,15 +29,15 @@ local function handleRequests(message, replyChannel)
 
     print("Received request from " .. station)
 
+    local successItems = {}
+    local failedItems = {}
+
     -- Process each item in the request
     for _, itemRequest in pairs(items) do
         local item = itemRequest.item
         local amount = itemRequest.amount
 
         print("Checking " .. amount .. " of " .. item)
-
-        local successItems = {}
-        local failedItems = {}
 
         if inventory[item] and inventory[item] >= amount then
             inventory[item] = inventory[item] - amount
@@ -76,6 +76,9 @@ end
 while true do
     local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
     if senderChannel == config.main_channel then
+        term.setTextColor(colors.green)
+        print("------------ New Request -------------")
+        term.setTextColor(colors.white)
         handleRequests(message, replyChannel)
     end
 end

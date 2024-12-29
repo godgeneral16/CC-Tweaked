@@ -37,6 +37,10 @@ local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
+        term.setTextColor(colors.green)
+        print("-------------------------")
+        term.setTextColor(colors.white)
+
         if senderChannel == config.main_channel then
             if type(message) == "table" and message.type == "response" then
                 if #message.successItems > 0 then
