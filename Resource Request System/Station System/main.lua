@@ -7,16 +7,53 @@ if not modem then
 end
 
 -- Load configuration
+local configFile = "config.txt"
 local config = {
     main_channel = 100,
     notify_channel = 101,
     reply_channel = os.getComputerID() + 1001
-    station_id = "station_1"
+    station_id = nil
 }
 
 -- Open channels
-modem.open(config.main_channel)
-modem.open(config.notify_channel)
+modem.open(config.main_channel) -- Open main channel
+modem.open(config.notify_channel) -- Open notify channel
+modem.open(config.reply_channel) -- Open reply channel specifically for this station
+
+-- Load config from file
+local function loadConfig()
+    if fs.exists(configFile) then
+        local file = fs.open(configFile, "r")
+        local data = textutils.unserialize(file.readAll())
+        file.close()
+
+        if data and data.station_id then
+            config.station_id = data.station_id
+        end
+    end
+end
+
+-- Save config to file
+local function saveConfig()
+    local file = fs.open(configFile, "w")
+    file.write(textutils.serialize(config))
+    file.close()
+end
+
+-- Initialize station config
+local function initStationConfig()
+    if not config.station_id then
+        term.setTextColor(colors.blue)
+        print("Enter the station ID:")
+        term.setTextColor(colors.white)
+        config.station_id = read()
+        saveConfig()
+        print("Station ID set to: " .. config.station_id)
+        sleep(1)
+        term.clear()
+        term.setCursorPos(1,1)
+    end
+end
 
 -- Send request for items
 local function requestResources(items)
@@ -38,7 +75,7 @@ local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
-        if senderChannel == config.main_channel then
+        if senderChannel == config.reply_channel then
             term.clear()
             term.setCursorPos(1,1)
             if type(message) == "table" and message.type == "response" then
@@ -113,13 +150,18 @@ local function getUserInput()
 
     return items
 end
--- Example request to send multiple items
-local itemsToRequest = getUserInput()
 
--- Request resources from Central Control
-if #itemsToRequest > 0 then
-    requestResources(itemsToRequest)
+-- Main program
+loadConfig()
+initStationConfig()
+
+while true do
+    -- Example request to send multiple items
+    local itemsToRequest = getUserInput()
+
+    -- Request resources from Central Control
+    if #itemsToRequest > 0 then
+        requestResources(itemsToRequest)
+        handleResponses()
+    end
 end
-
--- Handle responses and arrival notifications in parallel
-handleResponses()
