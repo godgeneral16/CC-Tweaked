@@ -34,6 +34,30 @@ local function getAvailableItems()
     return items
 end
 
+-- Normalize an item string
+local function normalizeItemName(name)
+    -- Remove namespace (anything before and including ':')
+    name = name:match(":(.*)") or name
+    -- Remove brackets and spaces, then lowercase
+    return name:lower():gsub("[%[%]]", ""):gsub(" ", "_")
+end
+
+-- Find an item in available stock
+local function findItemInStock(requestedItem, availableItems)
+    local normalizedRequested = normalizeItemName(requestedItem)
+
+    for _, availableItem in pairs(availableItems) do
+        local normalizedName = normalizeItemName(availableItem.name)
+        local normalizedDisplayName = normalizeItemName(availableItem.displayName)
+
+        if normalizedRequested == normalizedName or normalizedRequested == normalizedDisplayName then
+            return availableItem
+        end
+    end
+
+    return nil
+end
+
 -- Request handler
 local function handleRequests(message, replyChannel)
     local station = message.station
@@ -50,22 +74,18 @@ local function handleRequests(message, replyChannel)
     for _, itemRequest in pairs(items) do
         local item = itemRequest.item
         local amount = itemRequest.amount
+        local foundItem = findItemInStock(item, availableItems)
         local found = false
 
         print("Checking " .. amount .. " of " .. item)
 
-        for _, availableItem in pairs(availableItems) do
-            if availableItem.name == item and availableItem.amount >= amount then
-                print("Sending " .. amount .. " of " .. item .. " to " .. station)
-                table.insert(successItems, { item = item, amount = amount })
-                found = true
-                break
-            end
-        end
-
-        if not found then
-            print("Failed to send " .. amount .. " of " .. item .. " to " .. station)
-            table.insert(failedItems, { item = item, amount = amount, reason = "Insufficient stock" })
+        if foundItem and foundItem.amount >= amount then
+            print("Sending " .. amount .. " of " .. item .. " to " .. station)
+            table.insert(successItems, { item = item, amount = amount })
+        else
+            local reason = foundItem and "Insufficient stock" or "Item not found"
+            print("Failed to send " .. amount .. " of " .. item .. " to " .. station .. " - Reason: " .. reason)
+            table.insert(failedItems, { item = item, amount = amount, reason = reason })
         end
     end
 
