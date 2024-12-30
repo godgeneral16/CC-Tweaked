@@ -11,7 +11,7 @@ local configFile = "config.txt"
 local config = {
     main_channel = 100,
     notify_channel = 101,
-    reply_channel = os.getComputerID() + 1001
+    reply_channel = os.getComputerID() + 1001,
     station_id = nil
 }
 
