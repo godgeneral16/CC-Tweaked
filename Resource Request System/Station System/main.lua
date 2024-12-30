@@ -105,6 +105,7 @@ local function handleResponses()
                         print()
                     end
                 end
+                break
             end
         elseif senderChannel == config.notify_channel then
             if type(message) == "table" and message.type == "arrival" then
@@ -151,6 +152,15 @@ local function getUserInput()
     return items
 end
 
+-- Ask user if he wants to request more items
+local function requestMoreItems()
+    term.setTextColor(colors.blue)
+    print("Do you want to request more items? (y/n)")
+    term.setTextColor(colors.white)
+    local response = read()
+    return response == "y"
+end
+
 -- Main program
 loadConfig()
 initStationConfig()
@@ -164,4 +174,11 @@ while true do
         requestResources(itemsToRequest)
         handleResponses()
     end
+
+    if not requestMoreItems() then
+        print("Exiting...")
+        break
+    end
+    term.clear()
+    term.setCursorPos(1,1)
 end
