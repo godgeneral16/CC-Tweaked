@@ -6,8 +6,6 @@ if not modem then
     error("No wireless modem found")
 end
 
-term.clear()
-
 -- Load configuration
 local config = {
     main_channel = 100,
@@ -40,6 +38,8 @@ local function handleResponses()
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
         if senderChannel == config.main_channel then
+            term.clear()
+            term.setCursorPos(1,1)
             if type(message) == "table" and message.type == "response" then
                 if #message.successItems > 0 then
                     print(" ")
@@ -103,26 +103,22 @@ local function getUserInput()
         else
             table.insert(items, { item = itemName, amount = amount })
         end
+        term.setTextColor(colors.yellow)
+        print("Added " .. amount .. "x " .. itemName .. " to the request")
+        sleep(1)
+        term.clear()
+        term.setCursorPos(1,1)
     end
 
     return items
 end
 -- Example request to send multiple items
-while true do
-    local itemsToRequest = getUserInput()
+local itemsToRequest = getUserInput()
 
-    -- Request resources from Central Control
-    if #itemsToRequest > 0 then
-        requestResources(itemsToRequest)
-    end
-
-    -- Handle responses and arrival notifications in parallel
-    handleResponses()
-
-    print()
-    print("Do you want to make another request? (y/n)")
-    local answer = read()
-    if answer ~= "y" then
-        break
-    end
+-- Request resources from Central Control
+if #itemsToRequest > 0 then
+    requestResources(itemsToRequest)
 end
+
+-- Handle responses and arrival notifications in parallel
+handleResponses()
