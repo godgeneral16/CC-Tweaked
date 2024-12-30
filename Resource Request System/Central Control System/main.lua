@@ -75,6 +75,7 @@ local function loadLoaderConfig()
     end
 end
 
+-- Save loader config
 local function saveToLoaderConfig()
     local file = fs.open(loaderConfigFile, "w")
     file.write(textutils.serialize({ registeredLoaders = config.registeredLoaders }))
@@ -85,10 +86,12 @@ end
 local function handleLoaderRegistration(message, replyChannel)
     local loader_id = message.loader_id
     print("Received registration from loader " .. loader_id)
-    config.registeredLoaders[loader_id] = {
-        replyChannel = replyChannel
-    }
-    saveToLoaderConfig()
+    if not config.registeredLoaders[loader_id] then
+        config.registeredLoaders[loader_id] = { replyChannel = replyChannel }
+        saveToLoaderConfig()
+    else
+        print("Loader " .. loader_id .. " already registered")
+    end
 
     modem.transmit(replyChannel, config.main_channel, { status = "registered", message = "Loader registered" })
 end

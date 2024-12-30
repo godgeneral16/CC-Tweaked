@@ -129,6 +129,7 @@ local function fetchItems(items)
     end
 end
 
+-- Handle responses and arrival notifications
 local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
