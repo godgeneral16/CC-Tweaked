@@ -133,7 +133,7 @@ while true do
         print("------------ New Request -------------")
         term.setTextColor(colors.white)
         handleRequests(message, replyChannel)
-    elseif senderChannel == config.register_loader then
+    elseif senderChannel == config.loader_registration then
         handleLoaderRegistration(message, replyChannel)
     end
 end
