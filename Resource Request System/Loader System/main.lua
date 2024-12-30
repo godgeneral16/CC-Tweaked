@@ -29,9 +29,9 @@ local config = {
 }
 
 -- Open channels
-modem.open(config.main_channel) -- Open main channel
-modem.open(config.notify_channel) -- Open notify channel
-modem.open(config.reply_channel) -- Open reply channel specifically for this station
+wirelessModem.open(config.main_channel) -- Open main channel
+wirelessModem.open(config.notify_channel) -- Open notify channel
+wirelessModem.open(config.reply_channel) -- Open reply channel specifically for this station
 
 -- Load config from file
 local function loadConfig()
@@ -77,7 +77,7 @@ local function registerLoader()
 
     -- Send registration message to CCS
     wirelessModem.transmit(config.loader_registration, config.reply_channel, message)
-    print("Loader " .. loader_id .. " registered with CCS")
+    print("Loader " .. config.loader_id .. " registered with CCS")
 end
 
 local function handleResponses()
@@ -104,5 +104,8 @@ local function handleResponses()
 end
 
 -- Main loop
+loadConfig()
+initStationConfig()
+
 registerLoader()
 handleResponses()
