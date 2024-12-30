@@ -123,7 +123,7 @@ local function fetchItems(items)
     for _, item in ipairs(items) do
         local availableItem = findItemInStock(item.item.name, availableItems)
         if availableItem then
-            rsBridge.exportItem({name=item.item.name, amount=item.amount}, "right")
+            rsBridge.exportItem({name=item.item.name, count=item.amount}, "right")
             table.insert(fetchedItems, { name = availableItem.name, amount = amount })
         end
     end
