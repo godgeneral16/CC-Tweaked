@@ -18,14 +18,13 @@ local config = {
     main_channel = 100,
     notify_channel = 101,
     loader_registration = 900,
+    registeredLoaders = {}
 }
-
--- Registered loaders
-local registeredLoaders = {}
 
 -- Open channels
 modem.open(config.main_channel)
 modem.open(config.notify_channel)
+modem.open(config.loader_registration)
 
 -- load available items
 local function getAvailableItems()
@@ -62,11 +61,32 @@ local function findItemInStock(requestedItem, availableItems)
     return nil
 end
 
+-- Loader config
+local loaderConfigFile = "loader_config.txt"
+local function loadLoaderConfig()
+    if fs.exists(loaderConfigFile) then
+        local file = fs.open(loaderConfigFile, "r")
+        local data = textutils.unserialize(file.readAll())
+        file.close()
+
+        if data and data.registeredLoaders then
+            config.registeredLoaders = data.registeredLoaders
+        end
+    end
+end
+
+local function saveToLoaderConfig()
+    local file = fs.open(loaderConfigFile, "w")
+    file.write(textutils.serialize({ registeredLoaders = config.registeredLoaders }))
+    file.close()
+end
+
 -- Handle loader registration
 local function handleLoaderRegistration(message, replyChannel)
     local loader_id = message.loader_id
     print("Received registration from loader " .. loader_id)
-    registeredLoaders[loader_id] = true
+    config.registeredLoaders[loader_id] = true
+    saveToLoaderConfig()
 
     modem.transmit(replyChannel, config.main_channel, { status = "registered", message = "Loader registered" })
 end
@@ -112,6 +132,9 @@ local function handleRequests(message, replyChannel)
 
     modem.transmit(replyChannel, config.main_channel, response)
 
+    -- Send request to loaders
+
+
     -- Simulate dispatch logic
     if #successItems > 0 then
         print("Successfully dispatched items to " .. station)
@@ -126,6 +149,7 @@ local function handleRequests(message, replyChannel)
 end
 
 -- Main loop
+loadLoaderConfig()
 while true do
     local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
     if senderChannel == config.main_channel then
