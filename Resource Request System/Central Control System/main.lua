@@ -63,10 +63,12 @@ local function findItemInStock(requestedItem, availableItems)
 end
 
 -- Handle loader registration
-local function handleLoaderRegistration(message)
+local function handleLoaderRegistration(message, replyChannel)
     local loader_id = message.loader_id
     print("Received registration from loader " .. loader_id)
     registeredLoaders[loader_id] = true
+
+    modem.transmit(replyChannel, config.main_channel, { status = "registered", message = "Loader registered" })
 end
 
 -- Request handler
@@ -132,6 +134,6 @@ while true do
         term.setTextColor(colors.white)
         handleRequests(message, replyChannel)
     elseif senderChannel == config.register_loader then
-        handleLoaderRegistration(message)
+        handleLoaderRegistration(message, replyChannel)
     end
 end
