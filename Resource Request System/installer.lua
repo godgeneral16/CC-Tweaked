@@ -4,10 +4,12 @@ local version = "0.1.0-beta"
 local github_base_url = "https://raw.github.com/godgeneral16/CC-Tweaked/main/Resource%20Request%20System/"
 local ccs_file_path = "Central%20Control%20System/main.lua" -- Central Control System
 local station_file_path = "Station%20System/main.lua" -- Station System
+local loader_file_path = "Loader%20System/main.lua" -- Loader System
 
 -- Paths
 local ccs_path = "Resource_Request_System/CCS/"
 local station_path = "Resource_Request_System/Station/"
+local loader_path = "Resource_Request_System/Loader/"
 
 local file_name = "main.lua"
 
@@ -53,6 +55,9 @@ local function installSoftware(softwareType)
     elseif softwareType == "Station" then
         url = github_base_url .. station_file_path
         path = station_path
+    elseif softwareType == "Loader" then
+        url = github_base_url .. loader_file_path
+        path = loader_path
     else
         print("Invalid software type, please specify 'CCS' or 'Station'")
         return
@@ -88,6 +93,7 @@ end
 print("Which software would you like to install? Available options are:")
 print(" - CCS (Central Control System)")
 print(" - Station (Station System)")
+print(" - Loader (Loader System)")
 local softwareChoice = io.read()
 
 installSoftware(softwareChoice)
