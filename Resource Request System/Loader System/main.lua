@@ -88,12 +88,9 @@ local function handleResponses()
             if message.type == "request" then
                 print("Received request from CCS")
                 local items = message.items
-                local item = items[1]
-                local count = item.count
-                local itemName = item.name
-
-                print("Requesting " .. count .. " of " .. itemName)
-                rsBridge.requestItem(itemName, count)
+                for _, item in ipairs(items) do
+                    print("Requesting item: " .. item)
+                end
             end
 
             if message.type == "registered" then

@@ -85,10 +85,28 @@ end
 local function handleLoaderRegistration(message, replyChannel)
     local loader_id = message.loader_id
     print("Received registration from loader " .. loader_id)
-    config.registeredLoaders[loader_id] = true
+    config.registeredLoaders[loader_id] = {
+        replyChannel = replyChannel
+    }
     saveToLoaderConfig()
 
     modem.transmit(replyChannel, config.main_channel, { status = "registered", message = "Loader registered" })
+end
+
+-- Send request to loaders
+local function sendRequestToLoaders(loader, items)
+    local message = {
+        type = "request",
+        items = items
+    }
+
+    -- Check if loader exists in registered loaders
+    if config.registeredLoaders[loader] then
+        modem.transmit(config.registerdLoaders[loader].replyChannel, config.main_channel, message)
+    else
+        print("Loader " .. loader .. " is not registered")
+    end
+
 end
 
 -- Request handler
@@ -133,7 +151,7 @@ local function handleRequests(message, replyChannel)
     modem.transmit(replyChannel, config.main_channel, response)
 
     -- Send request to loaders
-
+    sendRequestToLoaders("godgeneral_base", successItems)
 
     -- Simulate dispatch logic
     if #successItems > 0 then
