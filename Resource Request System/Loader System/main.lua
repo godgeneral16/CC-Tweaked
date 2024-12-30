@@ -80,6 +80,41 @@ local function registerLoader()
     print("Loader " .. config.loader_id .. " registered with CCS")
 end
 
+-- load available items
+local function getAvailableItems()
+    local items = rsBridge.listItems()
+    if not items then
+        print("Failed to fetch items from RS Network")
+        return
+    end
+
+    return items
+end
+
+-- Normalize an item string
+local function normalizeItemName(name)
+    -- Remove namespace (anything before and including ':')
+    name = name:match(":(.*)") or name
+    -- Remove brackets and spaces, then lowercase
+    return name:lower():gsub("[%[%]]", ""):gsub(" ", "_")
+end
+
+-- Find an item in available stock
+local function findItemInStock(requestedItem, availableItems)
+    local normalizedRequested = normalizeItemName(requestedItem)
+
+    for _, availableItem in pairs(availableItems) do
+        local normalizedName = normalizeItemName(availableItem.name)
+        local normalizedDisplayName = normalizeItemName(availableItem.displayName)
+
+        if normalizedRequested == normalizedName or normalizedRequested == normalizedDisplayName then
+            return availableItem
+        end
+    end
+
+    return nil
+end
+
 local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
@@ -89,7 +124,7 @@ local function handleResponses()
                 print("Received request from CCS")
                 local items = message.items
                 for _, item in ipairs(items) do
-                    print("Requesting item: " .. item)
+                    print("Requesting item: " .. item.item.name)
                 end
             end
 

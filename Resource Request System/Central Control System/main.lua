@@ -118,6 +118,7 @@ local function handleRequests(message, replyChannel)
 
     local successItems = {}
     local failedItems = {}
+    local itemsToRequest = {}
 
     local availableItems = getAvailableItems()
 
@@ -133,6 +134,7 @@ local function handleRequests(message, replyChannel)
         if foundItem and foundItem.amount >= amount then
             print("Sending " .. amount .. " of " .. item .. " to " .. station)
             table.insert(successItems, { item = item, amount = amount })
+            table.insert(itemsToRequest, { item = foundItem, amount = amount })
         else
             local reason = foundItem and "Insufficient stock" or "Item not found"
             print("Failed to send " .. amount .. " of " .. item .. " to " .. station .. " - Reason: " .. reason)
@@ -151,7 +153,7 @@ local function handleRequests(message, replyChannel)
     modem.transmit(replyChannel, config.main_channel, response)
 
     -- Send request to loaders
-    sendRequestToLoaders("godgeneral_base", successItems)
+    sendRequestToLoaders("godgeneral_base", itemsToRequest)
 
     -- Simulate dispatch logic
     if #successItems > 0 then
