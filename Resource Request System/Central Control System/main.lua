@@ -17,7 +17,11 @@ end
 local config = {
     main_channel = 100,
     notify_channel = 101,
+    loader_registration = 900,
 }
+
+-- Registered loaders
+local registeredLoaders = {}
 
 -- Open channels
 modem.open(config.main_channel)
@@ -56,6 +60,13 @@ local function findItemInStock(requestedItem, availableItems)
     end
 
     return nil
+end
+
+-- Handle loader registration
+local function handleLoaderRegistration(message)
+    local loader_id = message.loader_id
+    print("Received registration from loader " .. loader_id)
+    registeredLoaders[loader_id] = true
 end
 
 -- Request handler
@@ -120,5 +131,7 @@ while true do
         print("------------ New Request -------------")
         term.setTextColor(colors.white)
         handleRequests(message, replyChannel)
+    elseif senderChannel == config.register_loader then
+        handleLoaderRegistration(message)
     end
 end
