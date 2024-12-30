@@ -6,6 +6,8 @@ if not modem then
     error("No wireless modem found")
 end
 
+term.clear()
+
 -- Load configuration
 local config = {
     main_channel = 100,
