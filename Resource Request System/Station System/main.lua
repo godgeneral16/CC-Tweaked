@@ -78,15 +78,35 @@ local function handleResponses()
     end
 end
 
+-- Ask user for items to request
+local function getUserInput()
+    local items = {}
+    while true do
+        print("Enther the item you want to request (or type 'done' to finish):")
+        print("(use correct item names, eg. 'minecraft:iron_ingot')")
+        local itemName = read()
+        if itemName == "done" then
+            break
+        end
+
+        print("How many " .. itemName .. " do you want to request?")
+        local amount = tonumber(read())
+        if not amount or amount <= 0 then
+            print("Invalid amount, please enter a number greater than 0")
+        else
+            table.insert(items, { item = itemName, amount = amount })
+        end
+    end
+
+    return items
+end
 -- Example request to send multiple items
-local itemsToRequest = {
-    { item = "iron_ingot", amount = 100 },
-    { item = "mekanism_uranium", amount = 500 },
-    { item = "gold_ingot", amount = 100 },
-}
+local itemsToRequest = getUserInput()
 
 -- Request resources from Central Control
-requestResources(itemsToRequest)
+if #itemsToRequest > 0 then
+    requestResources(itemsToRequest)
+end
 
 -- Handle responses and arrival notifications in parallel
 handleResponses()
