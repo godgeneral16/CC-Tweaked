@@ -82,14 +82,19 @@ end
 local function getUserInput()
     local items = {}
     while true do
+        term.setTextColor(colors.blue)
         print("Enther the item you want to request (or type 'done' to finish):")
         print("(use correct item names, eg. 'minecraft:iron_ingot')")
+        term.setTextColor(colors.white)
         local itemName = read()
         if itemName == "done" then
             break
         end
 
+        print()
+        term.setTextColor(colors.blue)
         print("How many " .. itemName .. " do you want to request?")
+        term.setTextColor(colors.white)
         local amount = tonumber(read())
         if not amount or amount <= 0 then
             print("Invalid amount, please enter a number greater than 0")
@@ -101,12 +106,21 @@ local function getUserInput()
     return items
 end
 -- Example request to send multiple items
-local itemsToRequest = getUserInput()
+while true do
+    local itemsToRequest = getUserInput()
 
--- Request resources from Central Control
-if #itemsToRequest > 0 then
-    requestResources(itemsToRequest)
+    -- Request resources from Central Control
+    if #itemsToRequest > 0 then
+        requestResources(itemsToRequest)
+    end
+
+    -- Handle responses and arrival notifications in parallel
+    handleResponses()
+
+    print()
+    print("Do you want to make another request? (y/n)")
+    local answer = read()
+    if answer ~= "y" then
+        break
+    end
 end
-
--- Handle responses and arrival notifications in parallel
-handleResponses()
