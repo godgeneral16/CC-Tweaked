@@ -5,11 +5,13 @@ local github_base_url = "https://raw.github.com/godgeneral16/CC-Tweaked/main/Res
 local ccs_file_path = "Central%20Control%20System/main.lua" -- Central Control System
 local station_file_path = "Station%20System/main.lua" -- Station System
 local loader_file_path = "Loader%20System/main.lua" -- Loader System
+local main_controller_file_path = "Main%20Controller/main.lua" -- Main Controller
 
 -- Paths
 local ccs_path = "Resource_Request_System/CCS/"
 local station_path = "Resource_Request_System/Station/"
 local loader_path = "Resource_Request_System/Loader/"
+local main_controller_path = "Resource_Request_System/Main_Controller/"
 
 local file_name = "main.lua"
 
@@ -58,10 +60,20 @@ local function installSoftware(softwareType)
     elseif softwareType == "Loader" then
         url = github_base_url .. loader_file_path
         path = loader_path
+    elseif softwareType == "Main" then
+        url = github_base_url .. main_controller_file_path
+        path = main_controller_path
     else
-        print("Invalid software type, please specify 'CCS' or 'Station'")
+        print("Please select a valid option")
         return
     end
+
+    term.setTextColor(colors.blue)
+    print("Installing ")
+    term.setTextColor(colors.green)
+    io.write(softwareType)
+    term.setTextColor(colors.white)
+    print()
 
     -- Check if file already exists
     if fs.exists(path) then
@@ -90,10 +102,18 @@ local function installSoftware(softwareType)
 end
 
 -- Ask user which software to install
-print("Which software would you like to install? Available options are:")
+term.setTextColor(colors.blue)
+print("Which program would you like to install? Available options are:")
+term.setTextColor(colors.white)
+print(" - Main (Main Controller)")
+term.setTextColor(colors.red)
+print("Note: Install only one Main Controller")
+term.setTextColor(colors.white)
+print()
 print(" - CCS (Central Control System)")
 print(" - Station (Station System)")
 print(" - Loader (Loader System)")
 local softwareChoice = io.read()
+term.clear()
 
 installSoftware(softwareChoice)
