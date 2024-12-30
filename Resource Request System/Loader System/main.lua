@@ -115,6 +115,20 @@ local function findItemInStock(requestedItem, availableItems)
     return nil
 end
 
+-- Export items from Refined Storage
+local function fetchItems(items)
+    local availableItems = getAvailableItems()
+    local fetchedItems = {}
+
+    for _, item in ipairs(items) do
+        local availableItem = findItemInStock(item.item.name, availableItems)
+        if availableItem then
+            rsBridge.exportItem({name=item.item.name, amount=item.amount}, "right")
+            table.insert(fetchedItems, { name = availableItem.name, amount = amount })
+        end
+    end
+end
+
 local function handleResponses()
     while true do
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
@@ -126,6 +140,7 @@ local function handleResponses()
                 for _, item in ipairs(items) do
                     print("Requesting item: " .. item.item.name)
                 end
+                fetchItems(items)
             end
 
             if message.type == "registered" then

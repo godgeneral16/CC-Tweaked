@@ -102,7 +102,7 @@ local function sendRequestToLoaders(loader, items)
 
     -- Check if loader exists in registered loaders
     if config.registeredLoaders[loader] then
-        modem.transmit(config.registerdLoaders[loader].replyChannel, config.main_channel, message)
+        modem.transmit(config.registeredLoaders[loader].replyChannel, config.main_channel, message)
     else
         print("Loader " .. loader .. " is not registered")
     end
