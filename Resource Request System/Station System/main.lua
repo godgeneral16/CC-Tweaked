@@ -10,6 +10,7 @@ end
 local config = {
     main_channel = 100,
     notify_channel = 101,
+    reply_channel = os.getComputerID() + 1001
     station_id = "station_1"
 }
 
@@ -29,7 +30,7 @@ local function requestResources(items)
     }
 
     -- Send the request message
-    modem.transmit(config.main_channel, config.main_channel, requestMessage)
+    modem.transmit(config.main_channel, config.reply_channel, requestMessage)
 end
 
 -- Handle responses and arrival notifications
