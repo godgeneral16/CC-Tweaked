@@ -19,6 +19,8 @@ local function logMessage(message, logType)
         logColor = colors.blue
     elseif logType == "ERROR" then
         logColor = colors.red
+    elseif logType == "NETWORK" then
+        logColor = colors.purple
     end
 
     term.write("[")
@@ -165,10 +167,22 @@ local function main()
     while true do
         local event, side, channel, replyChannel, message, distance = os.pullEvent("modem_message")
         if channel == config.main_controller_channels.ccs_registration then
-            -- Handle CCS registration
-            local ccs_id = message.ccs_id
-            local ccs_config = message.ccs_config
-            handleCCSRegistration(ccs_id, ccs_config)
+            if message.type == "register_ccs" then
+                -- Handle CCS registration
+                local ccs_id = message.ccs_id
+                local ccs_config = message.ccs_config
+                handleCCSRegistration(ccs_id, ccs_config)
+            end
+
+            if message.type == "update_ccs_loaders" then
+                -- Handle CCS loader update
+                logMessage("Loader update for CCS " .. message.ccs_id, "NETWORK")
+                local ccs_id = message.ccs_id
+                local loaders = message.loaders
+                config.ccs_list[ccs_id].loaders = loaders
+                saveConfig()
+                sendCCSUpdate()
+            end
         end
 
         if channel == config.main_controller_channels.main_channel then

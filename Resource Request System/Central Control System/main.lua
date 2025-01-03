@@ -141,6 +141,15 @@ local function saveToLoaderConfig()
     file.close()
 end
 
+local function sendCCSLoaderUpdate()
+    local message = {
+        type = "update_ccs_loaders",
+        loaders = config.registeredLoaders
+    }
+
+    modem.transmit(config.ccs_registration, config.ccs_channel, message)
+end
+
 -- Handle loader registration
 local function handleLoaderRegistration(message, replyChannel)
     local loader_id = message.loader_id
@@ -148,11 +157,12 @@ local function handleLoaderRegistration(message, replyChannel)
     if not config.registeredLoaders[loader_id] then
         config.registeredLoaders[loader_id] = { replyChannel = replyChannel }
         saveToLoaderConfig()
+        sendCCSLoaderUpdate()
     else
         print("Loader " .. loader_id .. " already registered")
     end
 
-    modem.transmit(replyChannel, config.main_channel, { status = "registered", message = "Loader registered" })
+    modem.transmit(replyChannel, config.ccs_channel, { status = "registered", message = "Loader registered" })
 end
 
 -- Send request to loaders
