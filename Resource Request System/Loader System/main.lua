@@ -112,7 +112,9 @@ local function initStationConfig()
     end
 
     if config.ccs_list and not config.loader_registration then
+        term.setTextColor(colors.blue)
         print("Please select a CCS to register with:")
+        term.setTextColor(colors.white)
     
         local ccs_keys = {}
         local index = 1
