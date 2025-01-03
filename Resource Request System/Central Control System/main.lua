@@ -247,13 +247,17 @@ loadLoaderConfig()
 registerCCS()
 while true do
     local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
-    if senderChannel == config.main_channel then
-        term.setTextColor(colors.green)
-        print("------------ New Request -------------")
-        term.setTextColor(colors.white)
-        handleRequests(message, replyChannel)
-    elseif senderChannel == config.loader_registration then
-        handleLoaderRegistration(message, replyChannel)
+    if senderChannel == config.ccs_channel then
+        if message.type == "request" then
+            term.setTextColor(colors.green)
+            print("------------ New Request -------------")
+            term.setTextColor(colors.white)
+            handleRequests(message, replyChannel)
+        end
+
+        if message.type == "register_loader" then
+            handleLoaderRegistration(message, replyChannel)
+        end
     end
 
     if senderChannel == config.update_channel then

@@ -45,7 +45,7 @@ local config = {
     notify_channel = 101,
     update_channel = 102,
     reply_channel = os.getComputerID() + 1001,
-    loader_registration = nil,
+    ccs_channel = nil,
     loader_id = nil,
     ccs_list = {},
     is_first_run = true
@@ -111,7 +111,7 @@ local function initStationConfig()
         term.setCursorPos(1,1)
     end
 
-    if config.ccs_list and not config.loader_registration then
+    if config.ccs_list and not config.ccs_channel then
         term.setTextColor(colors.blue)
         print("Please select a CCS to register with:")
         term.setTextColor(colors.white)
@@ -131,9 +131,9 @@ local function initStationConfig()
         local selectedCCS = ccs_keys[selectedIndex]
     
         if selectedCCS then
-            config.loader_registration = config.ccs_list[selectedCCS].channel
+            config.ccs_channel = config.ccs_list[selectedCCS].channel
             saveConfig()
-            logMessage("Registered with CCS: " .. selectedCCS)
+            logMessage("Set loader CCS: " .. selectedCCS)
             sleep(1)
             term.clear()
             term.setCursorPos(1,1)
@@ -151,7 +151,7 @@ local function registerLoader()
     }
 
     -- Send registration message to CCS
-    wirelessModem.transmit(config.loader_registration, config.reply_channel, message)
+    wirelessModem.transmit(config.ccs_channel, config.reply_channel, message)
     logMessage("Loader " .. config.loader_id .. " registered with CCS")
 end
 
