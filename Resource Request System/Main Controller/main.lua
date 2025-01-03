@@ -12,6 +12,26 @@ if not modem then
     error("No wireless modem found")
 end
 
+-- Function to log progress
+local function logMessages(message, logType)
+    if logType == nil then
+        logType = "INFO"
+        logColor = colors.blue
+    elseif logType == "ERROR" then
+        logColor = colors.red
+    end
+
+    term.write("[")
+    term.setTextColor(logColor)
+    term.write(logType)
+    term.setTextColor(colors.white)
+    term.write("] ")
+    term.setTextColor(colors.yellow)
+    term.write(message)
+    term.setTextColor(colors.white)
+    print()
+end
+
 -- Load configuration
 local configFile = "global_config.txt"
 local config = {
@@ -23,7 +43,7 @@ local config = {
         ccs_registration = 800,
         station_registration = 801,
         loader_registration = 900,
-    }
+    },
     global_config = {},
     ccs_list = {},
     ccs_mapping = {},
@@ -79,9 +99,11 @@ end
 -- @param ccs_config: table, the configuration of the CCS
 local function handleCCSRegistration(ccs_id, ccs_config)
     if not ccs_id or not ccs_config then
-        print("Invalid CCS registration, make sure ccs_id and ccs_config are provided")
+        logMessage("Invalid CCS registration, make sure ccs_id and ccs_config are provided", "ERROR")
+        return
     end
 
+    logMessage("Registering CCS " .. ccs_id)
     config.ccs_list[ccs_id] = ccs_config
     saveConfig()
     sendCCSUpdate() -- Send update to all systems
@@ -123,6 +145,7 @@ end
 
 -- Main loop
 local function main()
+    term.clear()
     loadConfig()
     initGlobalConfig()
 

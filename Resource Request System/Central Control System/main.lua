@@ -77,7 +77,7 @@ local function registerCCS()
         type = "register_ccs",
         ccs_id = config.ccs_id,
         ccs_config = {
-            channel = config.ccs_channel
+            channel = config.ccs_channel,
             loaders = config.registeredLoaders
         }
     }
