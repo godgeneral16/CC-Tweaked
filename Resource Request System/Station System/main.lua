@@ -68,7 +68,7 @@ local function fetchCCSList()
             type = "request_ccs_list"
         }
     
-        wirelessModem.transmit(config.main_channel, config.reply_channel, message)
+        modem.transmit(config.main_channel, config.reply_channel, message)
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
         if senderChannel == config.reply_channel then
