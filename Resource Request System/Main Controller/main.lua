@@ -13,7 +13,7 @@ if not modem then
 end
 
 -- Function to log progress
-local function logMessages(message, logType)
+local function logMessage(message, logType)
     if logType == nil then
         logType = "INFO"
         logColor = colors.blue
@@ -94,6 +94,18 @@ local function initGlobalConfig()
     end
 end
 
+-- Send ccs update to all systems
+local function sendCCSUpdate()
+    local message = {
+        type = "update_ccs_list",
+        ccs_list = config.ccs_list
+    }
+
+    logMessage("Sending CCS update to all systems")
+
+    modem.transmit(config.main_controller_channels.update_channel, config.main_controller_channels.reply_channel, message)
+end
+
 -- Handle CCS registration
 -- @param ccs_id: string, the ID of the CCS
 -- @param ccs_config: table, the configuration of the CCS
@@ -107,16 +119,6 @@ local function handleCCSRegistration(ccs_id, ccs_config)
     config.ccs_list[ccs_id] = ccs_config
     saveConfig()
     sendCCSUpdate() -- Send update to all systems
-end
-
--- Send ccs update to all systems
-local function sendCCSUpdate()
-    local message = {
-        type = "update_ccs_list",
-        ccs_list = config.ccs_list
-    }
-
-    modem.transmit(config.main_controller_channels.update_channel, config.main_controller_channels.reply_channel, message)
 end
 
 -- Set mapping of stations, ccs and loaders

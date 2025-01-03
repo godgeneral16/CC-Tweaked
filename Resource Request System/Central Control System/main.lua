@@ -234,6 +234,7 @@ end
 loadConfig()
 initCCSConfig()
 loadLoaderConfig()
+registerCCS()
 while true do
     local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
     if senderChannel == config.main_channel then
