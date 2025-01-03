@@ -113,16 +113,31 @@ local function initStationConfig()
 
     if config.ccs_list and not config.loader_registration then
         print("Please select a CCS to register with:")
-        for i, ccs in ipairs(config.ccs_list) do
-            print(i .. ". " .. ccs.ccs_id)
+    
+        local ccs_keys = {}
+        local index = 1
+    
+        -- Build a numbered list from the CCS table
+        for ccs_id, ccs_config in pairs(config.ccs_list) do
+            print(index .. ". " .. ccs_id)
+            ccs_keys[index] = ccs_id
+            index = index + 1
         end
-        local selectedCCS = tonumber(read())
-        config.loader_registration = config.ccs_list[selectedCCS].channel
-        saveConfig()
-        logMessage("Registered with CCS: " .. config.ccs_list[selectedCCS].ccs_id)
-        sleep(1)
-        term.clear()
-        term.setCursorPos(1,1)
+    
+        -- Get user input
+        local selectedIndex = tonumber(read())
+        local selectedCCS = ccs_keys[selectedIndex]
+    
+        if selectedCCS then
+            config.loader_registration = config.ccs_list[selectedCCS].channel
+            saveConfig()
+            logMessage("Registered with CCS: " .. selectedCCS)
+            sleep(1)
+            term.clear()
+            term.setCursorPos(1,1)
+        else
+            print("Invalid selection. Please try again.")
+        end
     end
 end
 
