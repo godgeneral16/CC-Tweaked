@@ -34,6 +34,7 @@ modem.open(config.loader_registration)
 modem.open(config.ccs_registration)
 modem.open(config.ccs_channel)
 
+local configFile = config.txt
 -- Load config from file
 local function loadConfig()
     if fs.exists(configFile) then
