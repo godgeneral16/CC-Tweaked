@@ -150,7 +150,7 @@ local function getUserInput()
     local items = {}
     while true do
         term.setTextColor(colors.blue)
-        print("Enther the item you want to request (or type 'done' to finish):")
+        print("Enter the item you want to request (or type 'done' to finish):")
         print("(use correct item names, eg. 'minecraft:iron_ingot')")
         term.setTextColor(colors.white)
         local itemName = read()
@@ -237,26 +237,29 @@ local function mainControllerUpdates()
 end
 
 -- Main program
-fetchCCSList()
-loadConfig()
-initStationConfig()
-mainControllerUpdates()
+local function main()
+    loadConfig()
+    initStationConfig()
+    fetchCCSList()
 
-while true do
-    selectCCS()
-    -- Example request to send multiple items
-    local itemsToRequest = getUserInput()
+    while true do
+        selectCCS()
+        -- Example request to send multiple items
+        local itemsToRequest = getUserInput()
 
-    -- Request resources from Central Control
-    if #itemsToRequest > 0 then
-        requestResources(itemsToRequest)
-        handleResponses()
+        -- Request resources from Central Control
+        if #itemsToRequest > 0 then
+            requestResources(itemsToRequest)
+            handleResponses()
+        end
+
+        if not requestMoreItems() then
+            print("Exiting...")
+            break
+        end
+        term.clear()
+        term.setCursorPos(1,1)
     end
-
-    if not requestMoreItems() then
-        print("Exiting...")
-        break
-    end
-    term.clear()
-    term.setCursorPos(1,1)
 end
+
+parallel.waitForAny(mainControllerUpdates, main)
