@@ -47,7 +47,7 @@ local config = {
     reply_channel = os.getComputerID() + 1001,
     loader_registration = nil,
     loader_id = nil,
-    ccs_list = {}
+    ccs_list = {},
     is_first_run = true
 }
 
@@ -61,7 +61,7 @@ wirelessModem.open(config.reply_channel) -- Open reply channel specifically for 
 local function fetchCCSList()
     if config.is_first_run then
         local message = {
-            type = "fetch_ccs_list"
+            type = "request_ccs_list"
         }
     
         wirelessModem.transmit(config.main_channel, config.reply_channel, message)

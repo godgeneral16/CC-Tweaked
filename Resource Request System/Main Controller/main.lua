@@ -106,6 +106,17 @@ local function sendCCSUpdate()
     modem.transmit(config.main_controller_channels.update_channel, config.main_controller_channels.reply_channel, message)
 end
 
+local function sendCCSListOnRequest(replyChannel)
+    local message = {
+        type = "ccs_list",
+        ccs_list = config.ccs_list
+    }
+
+    logMessage("Sending CCS list to requestor on channel " .. replyChannel)
+
+    modem.transmit(replyChannel, config.main_controller_channels.main_channel, message)
+end
+
 -- Handle CCS registration
 -- @param ccs_id: string, the ID of the CCS
 -- @param ccs_config: table, the configuration of the CCS
@@ -158,6 +169,14 @@ local function main()
             local ccs_id = message.ccs_id
             local ccs_config = message.ccs_config
             handleCCSRegistration(ccs_id, ccs_config)
+        end
+
+        if channel == config.main_controller_channels.main_channel then
+            -- Handle main controller messages
+            if message.type == "request_ccs_list" then
+                logMessage("Received request for CCS list")
+                sendCCSListOnRequest(replyChannel)
+            end
         end
     end
 end
