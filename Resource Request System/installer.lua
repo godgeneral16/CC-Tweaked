@@ -3,6 +3,7 @@ local version = "0.1.0-beta"
 -- Github information
 local github_base_url = "https://raw.github.com/godgeneral16/CC-Tweaked/main/Resource%20Request%20System/"
 local ccs_file_path = "Central%20Control%20System/main.lua" -- Central Control System
+local loader_mapping_path = "Central%20Control%20System/mapping.lua" -- Central Control System Mapping
 local station_file_path = "Station%20System/main.lua" -- Station System
 local loader_file_path = "Loader%20System/main.lua" -- Loader System
 local main_controller_file_path = "Main%20Controller/main.lua" -- Main Controller
@@ -14,6 +15,7 @@ local loader_path = "Resource_Request_System/Loader/"
 local main_controller_path = "Resource_Request_System/Main_Controller/"
 
 local file_name = "main.lua"
+local mapping_name = "mapping.lua"
 
 -- Function to log progress
 local function logProgress(message, logType)
@@ -120,6 +122,9 @@ local function installSoftware(softwareType)
 
     -- Download and install
     downloadFile(url, path, file_name)
+    if softwareType == "CCS" then
+        downloadFile(github_base_url .. loader_mapping_path, ccs_path, mapping_name)
+    end
     logProgress("Installation completed")
 end
 
