@@ -223,6 +223,15 @@ local function selectCCS()
     end
 end
 
+local function registerStation()
+    local message = {
+        type = "register_ccs",
+        station_id = config.station_id,
+        station_channel = config.reply_channel
+    }
+    modem.transmit(801, config.reply_channel, message)
+end
+
 -- Listen for Main Controller messages
 local function mainControllerUpdates()
     while true do

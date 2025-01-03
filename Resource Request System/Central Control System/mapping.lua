@@ -41,41 +41,41 @@ local function configureMapping()
     print("-----------------------------")
     print()
     print("Current mapping:")
-    for ccs_id, loader_id in pairs(config.loader_mapping or {}) do
+    for station_id, loader_id in pairs(config.loader_mapping or {}) do
         term.setTextColor(colors.purple)
-        io.write(ccs_id)
+        io.write(station_id)
         term.setTextColor(colors.white)
         io.write(" " .. string.char(26) .. " ")
         term.setTextColor(colors.yellow)
         print(loader_id)
         term.setTextColor(colors.white)
-        print()
     end
+    print()
 
     term.setTextColor(colors.yellow)
-    print("Enter CCS ID to configure (or 'exit' to exit):")
+    print("Enter Station ID to configure (or 'exit' to exit):")
     term.setTextColor(colors.white)
-    -- print list of CCSs
-    for ccs_id, _ in pairs(config.ccs_list) do
-        print(" - " .. ccs_id)
+    -- print list of Stations
+    for station_id, _ in pairs(config.station_list) do
+        print(" - " .. station_id)
     end
-    local ccs_id = read()
-    if ccs_id:lower() == "exit" then
+    local station_id = read()
+    if station_id:lower() == "exit" then
         term.setTextColor(colors.blue)
         print("Rebooting system to start main script")
         sleep(2)
-        reboot()
+        os.reboot()
     end
 
-    if not config.ccs_list[ccs_id] then
-        print("CCS not found")
+    if not config.station_list[station_id] then
+        print("Station not found")
         sleep(1)
         configureMapping()
         return
     end
 
     term.setTextColor(colors.yellow)
-    print("Enter loader ID to map to " .. ccs_id .. ":")
+    print("Enter loader ID to map to " .. station_id .. ":")
     term.setTextColor(colors.white)
 
     -- print list of loaders
@@ -93,11 +93,11 @@ local function configureMapping()
     end
 
     config.loader_mapping = config.loader_mapping or {}
-    config.loader_mapping[ccs_id] = loader_id
+    config.loader_mapping[station_id] = loader_id
     saveConfig()
     io.write("Mapping updated: ")
     term.setTextColor(colors.purple)
-    io.write(ccs_id)
+    io.write(station_id)
     term.setTextColor(colors.white)
     io.write(" " .. string.char(26) .. " ")
     term.setTextColor(colors.yellow)

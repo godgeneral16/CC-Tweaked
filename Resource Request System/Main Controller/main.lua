@@ -49,6 +49,7 @@ local config = {
     global_config = {},
     ccs_list = {},
     ccs_mapping = {},
+    station_list = {},
 }
 
 -- Open channels
@@ -108,13 +109,24 @@ local function sendCCSUpdate()
     modem.transmit(config.main_controller_channels.update_channel, config.main_controller_channels.reply_channel, message)
 end
 
+local function sendStationUpdate()
+    local message = {
+        type = "update_station_list",
+        station_list = config.station_list
+    }
+
+    logMessage("Sending station update to all systems")
+
+    modem.transmit(config.main_controller_channels.update_channel, config.main_controller_channels.reply_channel, message)
+end
+
 local function sendCCSListOnRequest(replyChannel)
     local message = {
         type = "ccs_list",
         ccs_list = config.ccs_list
     }
 
-    logMessage("Sending CCS list to requestor on channel " .. replyChannel)
+    logMessage("Sending CCS list on channel " .. replyChannel)
 
     modem.transmit(replyChannel, config.main_controller_channels.main_channel, message)
 end
@@ -132,6 +144,18 @@ local function handleCCSRegistration(ccs_id, ccs_config)
     config.ccs_list[ccs_id] = ccs_config
     saveConfig()
     sendCCSUpdate() -- Send update to all systems
+end
+
+local function handleStationRegistration(station_id, station_channel)
+    if not station_id or not station_channel then
+        logMessage("Invalid station registration, make sure station_id and station_channel are provided", "ERROR")
+        return
+    end
+
+    logMessage("Registering station " .. station_id)
+    config.station_list[station_id] = station_channel
+    saveConfig()
+    sendStationUpdate()
 end
 
 -- Set mapping of stations, ccs and loaders
@@ -185,11 +209,29 @@ local function main()
             end
         end
 
+        if channel == config.main_controller_channels.station_registration then
+            if message.type == "register_station" then
+                -- Handle station registration
+                local station_id = message.station_id
+                local station_channel = message.station_channel
+                handleStationRegistration(station_id, station_channel)
+            end
+        end
+
         if channel == config.main_controller_channels.main_channel then
             -- Handle main controller messages
             if message.type == "request_ccs_list" then
-                logMessage("Received request for CCS list")
+                logMessage("Received request for CCS list", "NETWORK")
                 sendCCSListOnRequest(replyChannel)
+            end
+
+            if message.type == "request_stations" then
+                logMessage("Received request for station list", "NETWORK")
+                local message = {
+                    type = "station_list",
+                    station_list = config.station_list
+                }
+                modem.transmit(replyChannel, config.main_controller_channels.main_channel, message)
             end
         end
     end

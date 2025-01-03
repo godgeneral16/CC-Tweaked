@@ -24,7 +24,9 @@ local config = {
     loader_registration = 900 + os.getComputerID(), -- Unique loader registration channel
     registeredLoaders = {},
     ccs_list = {},
-    loader_mapping = {}
+    station_list = {},
+    loader_mapping = {},
+    is_first_run = true
 }
 
 -- Open channels
@@ -56,8 +58,27 @@ local function saveConfig()
     file.close()
 end
 
+local function fetchStationList()
+    if config.is_first_run then
+        local message = {
+            type = "request_station_list"
+        }
+    
+        modem.transmit(config.main_channel, config.reply_channel, message)
+        local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
+
+        if senderChannel == config.reply_channel then
+            if message.type == "station_list" then
+                config.station_list = message.station_list
+                config.is_first_run = false
+            end
+        end
+    end
+end
+
 -- Initialize station config
 local function initCCSConfig()
+    fetchStationList()
     if not config.ccs_id then
         term.setTextColor(colors.blue)
         print("Enter the CCS ID (must be unique):")
@@ -265,6 +286,11 @@ while true do
     if senderChannel == config.update_channel then
         if message.type == "update_ccs_list" then
             config.ccs_list = message.ccs_list
+            saveConfig()
+        end
+
+        if message.type == "update_station_list" then
+            config.station_list = message.station_list
             saveConfig()
         end
     end
