@@ -146,6 +146,9 @@ local function handleCCSRegistration(ccs_id, ccs_config)
     sendCCSUpdate() -- Send update to all systems
 end
 
+-- Handle station registration
+-- @param station_id: string, the ID of the station
+-- @param station_channel: number, the channel of the station
 local function handleStationRegistration(station_id, station_channel)
     if not station_id or not station_channel then
         logMessage("Invalid station registration, make sure station_id and station_channel are provided", "ERROR")
