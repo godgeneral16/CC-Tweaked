@@ -249,6 +249,7 @@ while true do
     if senderChannel == config.update_channel then
         if message.type == "update_ccs_list" then
             config.ccs_list = message.ccs_list
+            saveConfig()
         end
     end
 end
