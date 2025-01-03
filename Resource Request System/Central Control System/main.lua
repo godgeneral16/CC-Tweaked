@@ -34,7 +34,7 @@ modem.open(config.loader_registration)
 modem.open(config.ccs_registration)
 modem.open(config.ccs_channel)
 
-local configFile = config.txt
+local configFile = "config.txt"
 -- Load config from file
 local function loadConfig()
     if fs.exists(configFile) then
@@ -61,7 +61,7 @@ local function initCCSConfig()
         term.setTextColor(colors.blue)
         print("Enter the CCS ID (must be unique):")
         term.setTextColor(colors.white)
-        config.station_id = read()
+        config.ccs_id = read()
         saveConfig()
         term.setTextColor(colors.green)
         print("CCS ID set to: " .. config.ccs_id)
