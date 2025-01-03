@@ -24,6 +24,7 @@ local config = {
     loader_registration = 900 + os.getComputerID(), -- Unique loader registration channel
     registeredLoaders = {},
     ccs_list = {},
+    loader_mapping = {}
 }
 
 -- Open channels

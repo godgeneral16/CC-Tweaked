@@ -46,6 +46,9 @@ local function configureMapping()
     end
 
     print("Enter CCS ID to configure (or 'exit' to exit):")
+    for ccs_id, _ in pairs(config.ccs_list) do
+        print(ccs_id)
+    end
     local ccs_id = read()
     if ccs_id:lower() == "exit" then return end
 
