@@ -11,13 +11,16 @@ local configFile = "config.txt"
 local config = {
     main_channel = 100,
     notify_channel = 101,
+    update_channel = 102,
     reply_channel = os.getComputerID() + 1001,
-    station_id = nil
+    station_id = nil,
+    ccs_list = {}
 }
 
 -- Open channels
 modem.open(config.main_channel) -- Open main channel
 modem.open(config.notify_channel) -- Open notify channel
+modem.open(config.update_channel) -- Open update channel
 modem.open(config.reply_channel) -- Open reply channel specifically for this station
 
 -- Load config from file
@@ -27,8 +30,8 @@ local function loadConfig()
         local data = textutils.unserialize(file.readAll())
         file.close()
 
-        if data and data.station_id then
-            config.station_id = data.station_id
+        if data then
+            config = data
         end
     end
 end
@@ -161,9 +164,23 @@ local function requestMoreItems()
     return response == "y"
 end
 
+-- Listen for Main Controller messages
+local function mainControllerUpdates()
+    while true do
+        local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
+
+        if senderChannel == config.update_channel then
+            if message.type == "update_ccs_list" then
+                config.ccs_list = message.ccs_list
+            end
+        end
+    end
+end
+
 -- Main program
 loadConfig()
 initStationConfig()
+mainControllerUpdates()
 
 while true do
     -- Example request to send multiple items

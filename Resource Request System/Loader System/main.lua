@@ -23,15 +23,18 @@ local configFile = "config.txt"
 local config = {
     main_channel = 100,
     notify_channel = 101,
+    update_channel = 102,
     reply_channel = os.getComputerID() + 1001,
     loader_registration = 900,
-    loader_id = nil
+    loader_id = nil,
+    ccs_list = {}
 }
 
 -- Open channels
 wirelessModem.open(config.main_channel) -- Open main channel
 wirelessModem.open(config.notify_channel) -- Open notify channel
-wirelessModem.open(config.reply_channel) -- Open reply channel specifically for this station
+wirelessModem.open(config.update_channel) -- Open update channel
+wirelessModem.open(config.reply_channel) -- Open reply channel specifically for this loader
 
 -- Load config from file
 local function loadConfig()
@@ -40,8 +43,8 @@ local function loadConfig()
         local data = textutils.unserialize(file.readAll())
         file.close()
 
-        if data and data.loader_id then
-            config.loader_id = data.loader_id
+        if data then
+            config = data
         end
     end
 end

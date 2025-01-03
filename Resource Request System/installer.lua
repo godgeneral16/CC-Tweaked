@@ -15,6 +15,26 @@ local main_controller_path = "Resource_Request_System/Main_Controller/"
 
 local file_name = "main.lua"
 
+-- Function to log progress
+local function logProgress(message, logType)
+    if logType == nil then
+        logType = "INFO"
+        logColor = colors.blue
+    elseif logType == "ERROR" then
+        logColor = colors.red
+    end
+
+    term.write("[")
+    term.setTextColor(logColor)
+    term.write(logType)
+    term.setTextColor(colors.white)
+    term.write("] ")
+    term.setTextColor(colors.yellow)
+    term.write(message)
+    term.setTextColor(colors.white)
+    print()
+end
+
 local function createDirectory(path)
     local dirs ={}
     for dir in path:gmatch("[^/]+") do
@@ -23,10 +43,11 @@ local function createDirectory(path)
 
     local currentPath = ""
     for i, dir in ipairs(dirs) do
+        logProgress("Checking if directory " .. currentPath .. dir .. " exists")
         currentPath = currentPath .. dir
         if not fs.exists(currentPath) then
             fs.makeDir(currentPath)
-            print("Created directory " .. currentPath)
+            logProgress("Created directory " .. currentPath)
         end
         currentPath = currentPath .. "/"
     end
@@ -35,14 +56,15 @@ end
 -- Download files from Github
 local function downloadFile(url, savePath, fileName)
     createDirectory(savePath)
+    logProgress("Downloading " .. savePath)
     local response = http.get(url)
     if response then
         local file = fs.open(savePath .. fileName, "w")
         file.write(response.readAll())
         file.close()
-        print("Downloaded " .. savePath)
+        logProgress("Downloaded " .. savePath)
     else
-        print("Failed to download " .. savePath)
+        logProgress("Failed to download " .. savePath, "ERROR")
     end
 end
 
@@ -93,12 +115,12 @@ local function installSoftware(softwareType)
         local startupFile = fs.open(startupPath, "w")
         startupFile.write("shell.run(\"" .. path .. file_name .. "\")")
         startupFile.close()
-        print("Startup script created successfully")
+        logProgress("Startup file created")
     end
 
     -- Download and install
     downloadFile(url, path, file_name)
-    print(softwareType .. " installed successfully")
+    logProgress("Installation completed")
 end
 
 -- Ask user which software to install

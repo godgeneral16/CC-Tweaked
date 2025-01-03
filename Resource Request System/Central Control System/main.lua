@@ -17,14 +17,72 @@ end
 local config = {
     main_channel = 100,
     notify_channel = 101,
-    loader_registration = 900,
-    registeredLoaders = {}
+    update_channel = 102,
+    ccs_channel = 4000 + os.getComputerID(), -- Unique channel for this CCS
+    ccs_id = nil,
+    ccs_registration = 800,
+    loader_registration = 900 + os.getComputerID(), -- Unique loader registration channel
+    registeredLoaders = {},
+    ccs_list = {},
 }
 
 -- Open channels
 modem.open(config.main_channel)
 modem.open(config.notify_channel)
+modem.open(config.update_channel)
 modem.open(config.loader_registration)
+modem.open(config.ccs_registration)
+modem.open(config.ccs_channel)
+
+-- Load config from file
+local function loadConfig()
+    if fs.exists(configFile) then
+        local file = fs.open(configFile, "r")
+        local data = textutils.unserialize(file.readAll())
+        file.close()
+
+        if data then
+            config = data
+        end
+    end
+end
+
+-- Save config to file
+local function saveConfig()
+    local file = fs.open(configFile, "w")
+    file.write(textutils.serialize(config))
+    file.close()
+end
+
+-- Initialize station config
+local function initCCSConfig()
+    if not config.ccs_id then
+        term.setTextColor(colors.blue)
+        print("Enter the CCS ID (must be unique):")
+        term.setTextColor(colors.white)
+        config.station_id = read()
+        saveConfig()
+        term.setTextColor(colors.green)
+        print("CCS ID set to: " .. config.ccs_id)
+        term.setTextColor(colors.white)
+        sleep(1)
+        term.clear()
+        term.setCursorPos(1,1)
+    end
+end
+
+-- Handle registration at Main Controller
+local function registerCCS()
+    local message = {
+        type = "register_ccs",
+        ccs_id = config.ccs_id,
+        ccs_config = {
+            channel = config.ccs_channel
+            loaders = config.registeredLoaders
+        }
+    }
+    modem.transmit(config.ccs_registration, config.ccs_channel, message)
+end
 
 -- load available items
 local function getAvailableItems()
@@ -182,5 +240,11 @@ while true do
         handleRequests(message, replyChannel)
     elseif senderChannel == config.loader_registration then
         handleLoaderRegistration(message, replyChannel)
+    end
+
+    if senderChannel == config.update_channel then
+        if message.type == "update_ccs_list" then
+            config.ccs_list = message.ccs_list
+        end
     end
 end
