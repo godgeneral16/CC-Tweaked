@@ -42,15 +42,30 @@ local function configureMapping()
     print()
     print("Current mapping:")
     for ccs_id, loader_id in pairs(config.loader_mapping or {}) do
-        print(ccs_id .. " → " .. loader_id)
+        term.setTextColor(colors.purple)
+        io.write(ccs_id)
+        term.setTextColor(colors.white)
+        io.write(" " .. string.char(26) .. " ")
+        term.setTextColor(colors.yellow)
+        print(loader_id)
+        term.setTextColor(colors.white)
+        print()
     end
 
+    term.setTextColor(colors.yellow)
     print("Enter CCS ID to configure (or 'exit' to exit):")
+    term.setTextColor(colors.white)
+    -- print list of CCSs
     for ccs_id, _ in pairs(config.ccs_list) do
-        print(ccs_id)
+        print(" - " .. ccs_id)
     end
     local ccs_id = read()
-    if ccs_id:lower() == "exit" then return end
+    if ccs_id:lower() == "exit" then
+        term.setTextColor(colors.blue)
+        print("Rebooting system to start main script")
+        sleep(2)
+        reboot()
+    end
 
     if not config.ccs_list[ccs_id] then
         print("CCS not found")
@@ -59,7 +74,15 @@ local function configureMapping()
         return
     end
 
+    term.setTextColor(colors.yellow)
     print("Enter loader ID to map to " .. ccs_id .. ":")
+    term.setTextColor(colors.white)
+
+    -- print list of loaders
+    for loader_id, _ in pairs(config.registeredLoaders) do
+        print(" - " .. loader_id)
+    end
+
     local loader_id = read()
 
     if not config.registeredLoaders[loader_id] then
@@ -72,8 +95,17 @@ local function configureMapping()
     config.loader_mapping = config.loader_mapping or {}
     config.loader_mapping[ccs_id] = loader_id
     saveConfig()
-    print("Mapping updated: " .. ccs_id .. " → " .. loader_id)
+    io.write("Mapping updated: ")
+    term.setTextColor(colors.purple)
+    io.write(ccs_id)
+    term.setTextColor(colors.white)
+    io.write(" " .. string.char(26) .. " ")
+    term.setTextColor(colors.yellow)
+    print(loader_id)
+    term.setTextColor(colors.white)
+    print()
     sleep(1)
+    configureMapping()
 end
 
 -- Main loop
