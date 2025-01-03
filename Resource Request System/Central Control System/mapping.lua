@@ -33,7 +33,7 @@ end
 
 -- Configure mapping for CCS
 local function configureMapping()
-    clear()
+    term.clear()
     term.setCursorPos(1, 1)
     term.setTextColor(colors.blue)
     print("Central Control System Mapping")
