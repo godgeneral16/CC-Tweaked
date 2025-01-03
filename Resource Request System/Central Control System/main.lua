@@ -61,13 +61,13 @@ end
 local function fetchStationList()
     if config.is_first_run then
         local message = {
-            type = "request_station_list"
+            type = "request_stations"
         }
     
-        modem.transmit(config.main_channel, config.reply_channel, message)
+        modem.transmit(config.main_channel, config.ccs_channel, message)
         local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
 
-        if senderChannel == config.reply_channel then
+        if senderChannel == config.ccs_channel then
             if message.type == "station_list" then
                 config.station_list = message.station_list
                 config.is_first_run = false

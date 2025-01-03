@@ -225,7 +225,7 @@ end
 
 local function registerStation()
     local message = {
-        type = "register_ccs",
+        type = "register_station",
         station_id = config.station_id,
         station_channel = config.reply_channel
     }
@@ -250,6 +250,7 @@ local function main()
     loadConfig()
     initStationConfig()
     fetchCCSList()
+    registerStation()
 
     while true do
         selectCCS()
