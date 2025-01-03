@@ -197,7 +197,7 @@ local function sendRequestToLoaders(loader, items)
 
     -- Check if loader exists in registered loaders
     if config.registeredLoaders[loader] then
-        modem.transmit(config.registeredLoaders[loader].replyChannel, config.main_channel, message)
+        modem.transmit(config.registeredLoaders[loader].replyChannel, config.ccs_channel, message)
     else
         print("Loader " .. loader .. " is not registered")
     end
@@ -245,10 +245,17 @@ local function handleRequests(message, replyChannel)
         failedItems = failedItems
     }
 
-    modem.transmit(replyChannel, config.main_channel, response)
+    modem.transmit(replyChannel, config.ccs_channel, response)
+
+    -- Get loader ID for station
+    local loader = config.loader_mapping[station]
+    if not loader then
+        print("No loader mapped to " .. station)
+        return
+    end
 
     -- Send request to loaders
-    sendRequestToLoaders("godgeneral_base", itemsToRequest)
+    sendRequestToLoaders(loader, itemsToRequest)
 
     -- Simulate dispatch logic
     if #successItems > 0 then
