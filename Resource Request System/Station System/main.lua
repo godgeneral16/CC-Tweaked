@@ -13,12 +13,16 @@ local config = {
     notify_channel = 101,
     update_channel = 102,
     reply_channel = os.getComputerID() + 1001,
+    ccs_channel = nil,
     station_id = nil,
-    ccs_list = {}
+    ccs_list = {},
+    is_first_run = true
 }
 
+
+local useCCS = {} -- Selected Central Control System for this station per request
+
 -- Open channels
-modem.open(config.main_channel) -- Open main channel
 modem.open(config.notify_channel) -- Open notify channel
 modem.open(config.update_channel) -- Open update channel
 modem.open(config.reply_channel) -- Open reply channel specifically for this station
@@ -58,6 +62,25 @@ local function initStationConfig()
     end
 end
 
+local function fetchCCSList()
+    if config.is_first_run then
+        local message = {
+            type = "request_ccs_list"
+        }
+    
+        wirelessModem.transmit(config.main_channel, config.reply_channel, message)
+        local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
+
+        if senderChannel == config.reply_channel then
+            if message.type == "ccs_list" then
+                config.ccs_list = message.ccs_list
+                config.is_first_run = false
+                saveConfig()
+            end
+        end
+    end
+end
+
 -- Send request for items
 local function requestResources(items)
     print("Sending request to CCS")
@@ -70,7 +93,7 @@ local function requestResources(items)
     }
 
     -- Send the request message
-    modem.transmit(config.main_channel, config.reply_channel, requestMessage)
+    modem.transmit(useCCS.channel, config.reply_channel, requestMessage)
 end
 
 -- Handle responses and arrival notifications
@@ -164,6 +187,42 @@ local function requestMoreItems()
     return response == "y"
 end
 
+-- Ask user to select a CCS to request from
+local function selectCCS()
+    if useCCS and useCCS.channel then
+        term.setTextColor(colors.blue)
+        print("Do you wish to change the CCS you are requesting from? (y/n)")
+        term.setTextColor(colors.white)
+        local response = read()
+        if response:lower() == "n" then
+            return
+        end
+    end
+    term.setTextColor(colors.blue)
+    print("From which system do you want to request items?:")
+    term.setTextColor(colors.white)
+
+    local ccsKeys = {}
+    local index = 1
+
+    -- Build a numbered list from the CCS table
+    for ccsId, ccsConfig in pairs(config.ccs_list) do
+        print(index .. ". " .. ccsId)
+        ccsKeys[index] = ccsId
+        index = index + 1
+    end
+
+    -- Get user input
+    local selectedIndex = tonumber(read())
+    local selectedCCS = ccsKeys[selectedIndex]
+
+    if selectedCCS then
+        useCCS = config.ccs_list[selectedCCS]
+    else
+        print("Invalid selection. Please try again.")
+    end
+end
+
 -- Listen for Main Controller messages
 local function mainControllerUpdates()
     while true do
@@ -178,11 +237,13 @@ local function mainControllerUpdates()
 end
 
 -- Main program
+fetchCCSList()
 loadConfig()
 initStationConfig()
 mainControllerUpdates()
 
 while true do
+    selectCCS()
     -- Example request to send multiple items
     local itemsToRequest = getUserInput()
 
