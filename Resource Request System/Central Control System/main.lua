@@ -144,6 +144,7 @@ end
 local function sendCCSLoaderUpdate()
     local message = {
         type = "update_ccs_loaders",
+        ccs_id = config.ccs_id,
         loaders = config.registeredLoaders
     }
 
