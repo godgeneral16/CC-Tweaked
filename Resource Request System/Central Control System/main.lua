@@ -230,6 +230,8 @@ local function handleRequests(message, replyChannel)
 end
 
 -- Main loop
+loadConfig()
+initCCSConfig()
 loadLoaderConfig()
 while true do
     local event, side, senderChannel, replyChannel, message, senderDistance = os.pullEvent("modem_message")
